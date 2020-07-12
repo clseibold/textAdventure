@@ -1,0 +1,6 @@
+#!/bin/bash
+
+# gnu99 needed for typeof()
+gcc -g -std=gnu99 main.c colors.c parsing.c language.c -o textAdventure
+
+chmod 755 textAdventure
