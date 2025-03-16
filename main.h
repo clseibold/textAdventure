@@ -21,6 +21,9 @@
 #define true 1
 #define false 0
 
+#define MAX(x, y) (((x) > (y)) ? (x) : (y))
+#define MIN(x, y) (((x) < (y)) ? (x) : (y))
+
 #include "libs/gb_string.h"
 #include "libs/stb_ds.h"
 #include "libs/stb_sprintf.h"
@@ -197,7 +200,7 @@ typedef struct DictHashMap {
 	DictValue value;
 } DictHashMap;
 
-void parseInput(char *input, DictHashMap *dictionary, DictValue **words, Phrase **phrases);
+Sentence parseInput(char *input, DictHashMap *dictionary, DictValue **words, Phrase **phrases);
 
 // --- language.c ---
 

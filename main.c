@@ -421,7 +421,7 @@ void addWordToDictionary(DictHashMap **dictionary, char *key, char partOfSpeechC
 	value.wordEnd = NULL;
 
 	size_t hash = stbds_hash_string_len(key, strlen(key), hashSeed);
-	printf("%s, hash: %ld\n", key, hash);
+	//printf("%s, hash: %ld\n", key, hash);
 	hmput(*dictionary, hash, value);
 }
 
@@ -432,16 +432,39 @@ DictHashMap *constructDictionary() {
 	//addWordToDictionary(&dictionary, "cut", 1, POS_VERB, POS_UNKNOWN, ITEM_NONE);
 	addWordToDictionary(&dictionary, "chop up", 1, POS_VERB, POS_UNKNOWN, ITEM_NONE);
 	addWordToDictionary(&dictionary, "cut up", 1, POS_VERB, POS_UNKNOWN, ITEM_NONE);
+	addWordToDictionary(&dictionary, "pick up", 1, POS_VERB, POS_UNKNOWN, ITEM_NONE);
+	addWordToDictionary(&dictionary, "forage", 1, POS_VERB, POS_UNKNOWN, ITEM_NONE);
 	addWordToDictionary(&dictionary, "the", 1, POS_ARTICLE_DEF, POS_UNKNOWN, ITEM_NONE);
 	addWordToDictionary(&dictionary, "a", 1, POS_ARTICLE_INDEF, POS_UNKNOWN, ITEM_NONE);
 	addWordToDictionary(&dictionary, "an", 1, POS_ARTICLE_INDEF_AN, POS_UNKNOWN, ITEM_NONE);
 	addWordToDictionary(&dictionary, "tree", 1, POS_NOUN, POS_UNKNOWN, ITEM_NONE);
+	addWordToDictionary(&dictionary, "log", 1, POS_NOUN, POS_UNKNOWN, ITEM_LOG);
 	addWordToDictionary(&dictionary, "with", 1, POS_PREPOSITION, POS_UNKNOWN, ITEM_NONE);
+	addWordToDictionary(&dictionary, "wooden axe", 1, POS_NOUN, POS_UNKNOWN, ITEM_WOOD_AXE);
+	addWordToDictionary(&dictionary, "wood axe", 1, POS_NOUN, POS_UNKNOWN, ITEM_WOOD_AXE);
 	addWordToDictionary(&dictionary, "axe", 1, POS_NOUN, POS_UNKNOWN, ITEM_WOOD_AXE);
 	addWordToDictionary(&dictionary, "go", 1, POS_VERB, POS_UNKNOWN, ITEM_NONE);
+	addWordToDictionary(&dictionary, "walk", 1, POS_VERB, POS_UNKNOWN, ITEM_NONE);
 	addWordToDictionary(&dictionary, "give", 1, POS_VERB, POS_UNKNOWN, ITEM_NONE);
 	addWordToDictionary(&dictionary, "goblin", 1, POS_NOUN, POS_UNKNOWN, ITEM_NONE);
-		addWordToDictionary(&dictionary, "to", 1, POS_PREPOSITION, POS_UNKNOWN, ITEM_NONE);
+	addWordToDictionary(&dictionary, "to", 1, POS_PREPOSITION, POS_UNKNOWN, ITEM_NONE);
+
+	addWordToDictionary(&dictionary, "north", 1, POS_NOUN, POS_UNKNOWN, ITEM_NONE);
+	addWordToDictionary(&dictionary, "south", 1, POS_NOUN, POS_UNKNOWN, ITEM_NONE);
+	addWordToDictionary(&dictionary, "east", 1, POS_NOUN, POS_UNKNOWN, ITEM_NONE);
+	addWordToDictionary(&dictionary, "west", 1, POS_NOUN, POS_UNKNOWN, ITEM_NONE);
+
+	addWordToDictionary(&dictionary, "quit", 1, POS_VERB, POS_UNKNOWN, ITEM_NONE);
+	addWordToDictionary(&dictionary, "exit", 1, POS_VERB, POS_UNKNOWN, ITEM_NONE);
+	//addWordToDictionary(&dictionary, "look through", 1, POS_VERB, POS_UNKNOWN, ITEM_NONE);
+	addWordToDictionary(&dictionary, "shuffle through", 1, POS_VERB, POS_UNKNOWN, ITEM_NONE);
+	addWordToDictionary(&dictionary, "search through", 1, POS_VERB, POS_UNKNOWN, ITEM_NONE); // search vs. search through
+	addWordToDictionary(&dictionary, "see", 1, POS_VERB, POS_UNKNOWN, ITEM_NONE);
+	addWordToDictionary(&dictionary, "show", 1, POS_VERB, POS_UNKNOWN, ITEM_NONE);
+	addWordToDictionary(&dictionary, "look into", 1, POS_VERB, POS_UNKNOWN, ITEM_NONE);
+	addWordToDictionary(&dictionary, "look around", 1, POS_VERB, POS_UNKNOWN, ITEM_NONE);
+	addWordToDictionary(&dictionary, "inventory", 1, POS_NOUN, POS_UNKNOWN, ITEM_NONE);
+	addWordToDictionary(&dictionary, "backpack", 1, POS_NOUN, POS_UNKNOWN, ITEM_NONE);
 
 	return dictionary;
 }
@@ -504,7 +527,9 @@ bool parseNounPhrase(DictValue **words, int *currentWordIndex, NounPhrase *phras
 		return parseNoun(words, currentWordIndex, phrase);
 	} else if (parseIndefiniteAnArticle(words, currentWordIndex, phrase)) {
 		return parseNoun(words, currentWordIndex, phrase);
-	} else return false;
+	} else {
+		return parseNoun(words, currentWordIndex, phrase);
+	}
 }
 
 bool parsePronoun(DictValue **words, int *currentWordIndex, NounPhrase *phrase) {
@@ -667,7 +692,7 @@ void printSentence(Sentence sentence) {
 	}
 }
 
-void parseInput(char *input, DictHashMap *dictionary, DictValue **words, Phrase **phrases) { // TODO: parseInputEnglish?
+Sentence parseInput(char *input, DictHashMap *dictionary, DictValue **words, Phrase **phrases) { // TODO: parseInputEnglish?
 	char *current = input;
 	char *wordStart = current;
 	bool appendWord = false;
@@ -739,7 +764,7 @@ void parseInput(char *input, DictHashMap *dictionary, DictValue **words, Phrase 
 	// the gift - direct object
 	// to the man - prepositional phrase
 
-	if (arrlen(words) <= 0) return;
+	if (arrlen(*words) == 0) return;
 	int currentWordIndex = 0;
 	Sentence sentence = {0};
 	bool success = parseVerb(words, &currentWordIndex, &sentence);
@@ -784,10 +809,10 @@ void parseInput(char *input, DictHashMap *dictionary, DictValue **words, Phrase 
 		}
 	}
 
-	printSentence(sentence);
+	//printSentence(sentence);
 	puts("");
 
-	return;
+	return sentence;
 
 	// Parse Phrases
 	bool hasArticle = false;
@@ -854,6 +879,83 @@ void parseInput(char *input, DictHashMap *dictionary, DictValue **words, Phrase 
 	}
 }
 
+char handlePlayer(Sentence sentence) {
+	char *verb = sentence.mainVerb.wordStart;
+	NounPhrase directObj = sentence.directObj;
+	NounPhrase indirectObj = sentence.indirectObj;
+
+	if (strncmp(verb, "forage", MAX(6, sentence.mainVerb.wordEnd - sentence.mainVerb.wordStart)) == 0) {
+		return 'f';
+	} else if (strncmp(verb, "quit", MAX(4, sentence.mainVerb.wordEnd - sentence.mainVerb.wordStart)) == 0
+				|| strncmp(verb, "exit", MAX(4, sentence.mainVerb.wordEnd - sentence.mainVerb.wordStart)) == 0) {
+		return 'q';
+	} else if (strncmp(verb, "look through", MAX(12, sentence.mainVerb.wordEnd - sentence.mainVerb.wordStart)) == 0
+				|| strncmp(verb, "shuffle through", MAX(15, sentence.mainVerb.wordEnd - sentence.mainVerb.wordStart)) == 0
+				|| strncmp(verb, "search through", MAX(14, sentence.mainVerb.wordEnd - sentence.mainVerb.wordStart)) == 0
+				|| strncmp(verb, "see", MAX(3, sentence.mainVerb.wordEnd - sentence.mainVerb.wordStart)) == 0
+				|| strncmp(verb, "show", MAX(4, sentence.mainVerb.wordEnd - sentence.mainVerb.wordStart)) == 0
+				|| strncmp(verb, "look into", MAX(9, sentence.mainVerb.wordEnd - sentence.mainVerb.wordStart)) == 0) {
+					if (strncmp(directObj.noun.wordStart, "backpack", MAX(8, directObj.noun.wordEnd - directObj.noun.wordStart)) == 0
+						|| strncmp(directObj.noun.wordStart, "inventory", MAX(9, directObj.noun.wordEnd - directObj.noun.wordStart)) == 0) {
+							return 'i';
+					}
+	} else if (strncmp(verb, "pick up", MAX(7, sentence.mainVerb.wordEnd - sentence.mainVerb.wordStart)) == 0) {
+		switch (directObj.noun.itemType) {
+			case ITEM_WOOD_AXE:
+			{
+				return 'p';
+			} break;
+		}
+	} else if (strncmp(verb, "go", MAX(2, sentence.mainVerb.wordEnd - sentence.mainVerb.wordStart)) == 0
+				|| strncmp(verb, "walk", MAX(4, sentence.mainVerb.wordEnd - sentence.mainVerb.wordStart)) == 0) {
+		DictValue noun;
+		noun = directObj.noun;
+		if (noun.wordEnd - noun.wordStart <= 0) {
+			PrepositionalPhrase p_phrase = *((PrepositionalPhrase *) &sentence.p_phrase);
+			DictValue preposition = p_phrase.preposition;
+			if (strncmp(preposition.wordStart, "to", MAX(2, preposition.wordEnd - preposition.wordStart)) == 0) {
+				noun = p_phrase.nounPhrase.noun;
+			} else {
+				return 0;
+			}
+		}
+
+		if (strncmp(noun.wordStart, "north", MAX(5, directObj.noun.wordEnd - directObj.noun.wordStart)) == 0) {
+			return 'n';
+		} else if (strncmp(noun.wordStart, "south", MAX(5, noun.wordEnd - noun.wordStart)) == 0) {
+			return 's';
+		} else if (strncmp(noun.wordStart, "east", MAX(4, noun.wordEnd - noun.wordStart)) == 0) {
+			return 'e';
+		} else if (strncmp(noun.wordStart, "west", MAX(5, noun.wordEnd - noun.wordStart)) == 0) {
+			return 'w';
+		}
+	} else if (strncmp(verb, "look around", MAX(11, sentence.mainVerb.wordEnd - sentence.mainVerb.wordStart)) == 0) {
+		return 0;
+	}
+
+	return 0;
+}
+
+char handleInstrument(Sentence sentence) {
+	PrepositionalPhrase p_phrase = *((PrepositionalPhrase *) &sentence.p_phrase);
+	DictValue preposition = p_phrase.preposition;
+	if (strncmp(preposition.wordStart, "with", MAX(4, preposition.wordEnd - preposition.wordStart)) == 0) {
+		char *verb = sentence.mainVerb.wordStart;
+		NounPhrase n_phrase = p_phrase.nounPhrase;
+		switch (n_phrase.noun.itemType) {
+			case ITEM_WOOD_AXE:
+			{
+				if (strncmp(verb, "cut down", MAX(8, sentence.mainVerb.wordEnd - sentence.mainVerb.wordStart)) == 0) {
+					//printf("Cutting down the tree!\n");
+					return 'c';
+				}
+			} break;
+		}
+	}
+
+	return 0;
+}
+
 int main() {
 	hashSeed = time(0);
 	World world = initializeWorld(700, 700, time(0));
@@ -902,17 +1004,19 @@ int main() {
 
 		if (input[0] == 'q' && input[1] == '\n') exit(0);
 
+		
 		DictValue *words = NULL;
 		Phrase *phrases = NULL;
-		parseInput(input, dictionary, &words, &phrases);
-		//bool success = handlePlayer();
-		//if (!success) success = handleInstrument();
+		Sentence sentence = parseInput(input, dictionary, &words, &phrases);
+		char success = handlePlayer(sentence);
+		if (!success) success = handleInstrument(sentence);
 
-		arrsetlen(input, 0);
-		continue; // TODO
+		//arrsetlen(input, 0);
+		//continue; // TODO
+		
 		
 		// TODO: Add command to (re)print surroundings.
-		switch (input[0]) {
+		switch (/*input[0]*/ success) {
 			case 'n':
 			case 'u':
 			{
@@ -922,6 +1026,7 @@ int main() {
 					arrsetlen(input, 0);
 					continue;
 				}
+				printf("You walk to the north.\n");
 				playerPositionY--;
 				if (playerPositionY < 0) playerPositionY = 0;
 				playerEnergy -= movementEnergy;
@@ -935,6 +1040,7 @@ int main() {
 					arrsetlen(input, 0);
 					continue;
 				}
+				printf("You walk to the south.\n");
 				playerPositionY++;
 				if (playerPositionY >= world.height) playerPositionY = world.height - 1;
 				playerEnergy -= movementEnergy;
@@ -948,6 +1054,7 @@ int main() {
 					arrsetlen(input, 0);
 					continue;
 				}
+				printf("You walk to the west.\n");
 				playerPositionX--;
 				if (playerPositionX < 0) playerPositionX = 0;
 				playerEnergy -= movementEnergy;
@@ -961,6 +1068,7 @@ int main() {
 					arrsetlen(input, 0);
 					continue;
 				}
+				printf("You walk to the east.\n");
 				playerPositionX++;
 				if (playerPositionX >= world.width) playerPositionX = world.width - 1;
 				playerEnergy -= movementEnergy;
@@ -1080,8 +1188,8 @@ int main() {
 					}
 					
 					if (inventoryItemCount > 1)
-						printf("You shuffle through your backpack and see ");
-					else printf("You look into your backpack and see ");
+						printf("You search through your backpack and find ");
+					else printf("You look into your backpack and find ");
 					
 					// TODO
 					for (int i = 0; i <= ITEM_LAST; i++) {
